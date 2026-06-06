@@ -15,8 +15,8 @@ This project simulates building a minimum viable SOC from scratch for a small fi
 | VM | Role | Size | OS |
 |---|---|---|---|
 | `soc-lab-windows` | Victim endpoint | Standard D2s v3 | Windows 11 Pro |
-| `ubuntu-server` | Linux server + Zeek | Standard D2s v3 | Ubuntu Server 22.04 |
-| `wazuh-siem` | SIEM | Standard D4s v3 | Ubuntu Server 22.04 |
+| `soc-lab-UbuntuServer` | Linux server + Zeek | Standard D2s v3 | Ubuntu Server 24.04 LTS |
+| `soc-lab-wazuh` | SIEM | Standard D4s v3 | Ubuntu Server 24.04 LTS |
 
 All VMs are deployed on **Microsoft Azure** (East US region) inside an isolated Virtual Network (`soc-lab-vnet`, `10.0.0.0/16`).
 
@@ -27,7 +27,7 @@ All VMs are deployed on **Microsoft Azure** (East US region) inside an isolated 
 ### Infrastructure
 - **Cloud:** Microsoft Azure (Azure for Students)
 - **Virtualization:** Azure Virtual Machines
-- **Network:** Azure Virtual Network (isolated, no inbound from internet)
+- **Network:** Azure Virtual Network (`soc-lab-vnet`, isolated)
 
 ### Telemetry
 - **Sysmon** (SwiftOnSecurity config) — deep Windows endpoint visibility
@@ -69,12 +69,12 @@ Ubuntu VM (auditd + Zeek          Wazuh SIEM
 - [x] Azure resource group created (`soc-lab`)
 - [x] Isolated virtual network deployed (`soc-lab-vnet`)
 - [x] Windows 11 VM deployed (`soc-lab-windows`)
-- [ ] Ubuntu Server VM deployed
-- [ ] Wazuh SIEM VM deployed
+- [x] Ubuntu Server VM deployed (`soc-lab-UbuntuServer`)
+- [x] Wazuh SIEM VM deployed (`soc-lab-wazuh`)
 - [ ] Sysmon installed on Windows (SwiftOnSecurity config)
 - [ ] auditd configured on Ubuntu
 - [ ] Zeek installed and shipping logs
-- [ ] All logs searchable in Wazuh
+- [ ] Wazuh agents connected and logs searchable
 
 ### Phase 2 — Attack Simulation
 - [ ] ≥ 6 ATT&CK techniques selected (≥ 3 tactics)
@@ -123,12 +123,13 @@ Ubuntu VM (auditd + Zeek          Wazuh SIEM
 - Microsoft Azure account (student or PAYG)
 - Basic Linux CLI knowledge
 - Git installed
+- SSH key pair generated
 
 ### Quick Start
 ```bash
 # Clone this repo
-git clone https://github.com/YOUR_USERNAME/soc-lab.git
-cd soc-lab
+git clone https://github.com/Emiliano-Its/SOC-Lab-And-Detection.git
+cd SOC-Lab-And-Detection
 
 # Deploy lab (Terraform template coming soon)
 # For now, follow manual steps in /architecture/
@@ -161,3 +162,4 @@ cd soc-lab
 
 Jose Emiliano Cortez Rivera  
 Cybersecurity Student — Universidad Autónoma de Nuevo León  
+GitHub: [Emiliano-Its](https://github.com/Emiliano-Its)
