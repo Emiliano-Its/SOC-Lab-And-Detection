@@ -71,10 +71,13 @@ Ubuntu VM (auditd + Zeek          Wazuh SIEM
 - [x] Windows 11 VM deployed (`soc-lab-windows`)
 - [x] Ubuntu Server VM deployed (`soc-lab-UbuntuServer`)
 - [x] Wazuh SIEM VM deployed (`soc-lab-wazuh`)
+- [x] Wazuh SIEM installed and dashboard accessible
+- [x] Wazuh agent installed on Windows (`windows-endpoint`)
+- [x] Wazuh agent installed on Ubuntu (`ubuntu-server`)
 - [ ] Sysmon installed on Windows (SwiftOnSecurity config)
 - [ ] auditd configured on Ubuntu
 - [ ] Zeek installed and shipping logs
-- [ ] Wazuh agents connected and logs searchable
+- [ ] Verify all logs searchable in Wazuh
 
 ### Phase 2 — Attack Simulation
 - [ ] ≥ 6 ATT&CK techniques selected (≥ 3 tactics)
