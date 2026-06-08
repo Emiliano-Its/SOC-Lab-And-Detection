@@ -31,11 +31,11 @@ All VMs are deployed on **Microsoft Azure** (East US region) inside an isolated 
 
 ### Telemetry
 - **Sysmon** (SwiftOnSecurity config) — deep Windows endpoint visibility
-- **auditd** — Linux command and file activity
-- **Zeek** — network traffic analysis
+- **auditd** (Neo23x0 ruleset) — Linux command and file activity
+- **Zeek 8.2.0** — network traffic analysis (JSON output)
 
 ### SIEM
-- **Wazuh 4.x** — log ingestion, alerting, MITRE ATT&CK mapping
+- **Wazuh 4.14.5** — log ingestion, alerting, MITRE ATT&CK mapping
 - **Wazuh Agent** — installed on Windows and Ubuntu VMs
 
 ### Attack Simulation
@@ -71,12 +71,15 @@ Ubuntu VM (auditd + Zeek          Wazuh SIEM
 - [x] Windows 11 VM deployed (`soc-lab-windows`)
 - [x] Ubuntu Server VM deployed (`soc-lab-UbuntuServer`)
 - [x] Wazuh SIEM VM deployed (`soc-lab-wazuh`)
-- [x] Wazuh SIEM installed and dashboard accessible
+- [x] Wazuh 4.14.5 installed and dashboard accessible
 - [x] Wazuh agent installed on Windows (`windows-endpoint`)
 - [x] Wazuh agent installed on Ubuntu (`ubuntu-server`)
-- [ ] Sysmon installed on Windows (SwiftOnSecurity config)
-- [ ] auditd configured on Ubuntu
-- [ ] Zeek installed and shipping logs
+- [x] Sysmon installed on Windows (SwiftOnSecurity config)
+- [x] Sysmon events flowing into Wazuh (verified via Threat Hunting)
+- [x] auditd configured on Ubuntu (Neo23x0 ruleset)
+- [x] auditd events flowing into Wazuh
+- [x] Zeek 8.2.0 installed and capturing network traffic
+- [ ] Zeek JSON logs shipping to Wazuh
 - [ ] Verify all logs searchable in Wazuh
 
 ### Phase 2 — Attack Simulation
@@ -138,6 +141,12 @@ cd SOC-Lab-And-Detection
 # For now, follow manual steps in /architecture/
 ```
 
+### Key Lessons Learned
+- Wazuh agent requires read permissions on log files — add `wazuh` user to `adm` group for audit.log access
+- Zeek must be configured to output JSON format for Wazuh compatibility
+- Azure NSG must have port 443 open for Wazuh dashboard external access
+- Always stop VMs from Azure Portal (not from inside the OS) to get "Stopped (deallocated)" state
+
 ---
 
 ## MITRE ATT&CK Coverage
@@ -156,6 +165,8 @@ cd SOC-Lab-And-Detection
 - [Sigma HQ](https://github.com/SigmaHQ/sigma)
 - [Atomic Red Team](https://github.com/redcanaryco/atomic-red-team)
 - [SwiftOnSecurity Sysmon Config](https://github.com/SwiftOnSecurity/sysmon-config)
+- [Neo23x0 auditd Rules](https://github.com/Neo23x0/auditd)
+- [Zeek Documentation](https://docs.zeek.org)
 - [Wazuh Documentation](https://documentation.wazuh.com)
 - [The DFIR Report](https://thedfirreport.com)
 
