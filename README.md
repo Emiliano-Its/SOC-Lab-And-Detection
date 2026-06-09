@@ -65,7 +65,7 @@ Ubuntu VM (auditd + Zeek          Wazuh SIEM
 
 ## Project Phases
 
-### Phase 1 — Lab Build & Telemetry *(current)*
+### Phase 1 — Lab Build & Telemetry ✅ COMPLETE
 - [x] Azure resource group created (`soc-lab`)
 - [x] Isolated virtual network deployed (`soc-lab-vnet`)
 - [x] Windows 11 VM deployed (`soc-lab-windows`)
@@ -78,11 +78,11 @@ Ubuntu VM (auditd + Zeek          Wazuh SIEM
 - [x] Sysmon events flowing into Wazuh (verified via Threat Hunting)
 - [x] auditd configured on Ubuntu (Neo23x0 ruleset)
 - [x] auditd events flowing into Wazuh
-- [x] Zeek 8.2.0 installed and capturing network traffic
-- [ ] Zeek JSON logs shipping to Wazuh
-- [ ] Verify all logs searchable in Wazuh
+- [x] Zeek 8.2.0 installed and capturing network traffic (JSON format)
+- [x] Zeek logs flowing into Wazuh archives
+- [x] All logs searchable in Wazuh
 
-### Phase 2 — Attack Simulation
+### Phase 2 — Attack Simulation *(current)*
 - [ ] ≥ 6 ATT&CK techniques selected (≥ 3 tactics)
 - [ ] Atomic Red Team installed on Windows VM
 - [ ] Each technique executed and logged
@@ -123,8 +123,6 @@ Ubuntu VM (auditd + Zeek          Wazuh SIEM
 
 ## How to Reproduce the Lab
 
-> Full setup guide coming as phases are completed.
-
 ### Prerequisites
 - Microsoft Azure account (student or PAYG)
 - Basic Linux CLI knowledge
@@ -136,16 +134,17 @@ Ubuntu VM (auditd + Zeek          Wazuh SIEM
 # Clone this repo
 git clone https://github.com/Emiliano-Its/SOC-Lab-And-Detection.git
 cd SOC-Lab-And-Detection
-
-# Deploy lab (Terraform template coming soon)
-# For now, follow manual steps in /architecture/
 ```
 
 ### Key Lessons Learned
-- Wazuh agent requires read permissions on log files — add `wazuh` user to `adm` group for audit.log access
-- Zeek must be configured to output JSON format for Wazuh compatibility
+- Wazuh agent requires read permissions on log files
+  - Add `wazuh` user to `adm` group for audit.log: `sudo usermod -aG adm wazuh`
+  - Add `wazuh` user to `zeek` group for Zeek logs: `sudo usermod -aG zeek wazuh`
+- Zeek must output JSON format: add `@load policy/tuning/json-logs` to local.zeek
+- Zeek actual log path is `/opt/zeek/spool/zeek/` not `/opt/zeek/logs/current/`
+- Enable `logall_json` in Wazuh to archive all logs including non-alert events
 - Azure NSG must have port 443 open for Wazuh dashboard external access
-- Always stop VMs from Azure Portal (not from inside the OS) to get "Stopped (deallocated)" state
+- Always stop VMs from Azure Portal to get "Stopped (deallocated)" state
 
 ---
 
@@ -174,6 +173,6 @@ cd SOC-Lab-And-Detection
 
 ## Author
 
-Jose Emiliano Cortez Rivera  
-Cybersecurity Student — Universidad Autónoma de Nuevo León  
+Jose Emiliano Cortez Rivera
+Cybersecurity Student — Universidad Autónoma de Nuevo León
 GitHub: [Emiliano-Its](https://github.com/Emiliano-Its)
