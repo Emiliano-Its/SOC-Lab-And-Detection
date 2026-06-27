@@ -1,8 +1,5 @@
 # Home SOC Lab & Detection Engineering
 
-> Practical capstone project for SOC Analyst (Tier 1/2) — Detection Engineering
-
----
 
 ## Project Overview
 
