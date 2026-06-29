@@ -17,4 +17,4 @@ Jun 27, 2026  7:42 AM
 - Process creation events associated with `net.exe` and other network enumeration utilities
 
 ### Screenshot
-![](img/T1016.png)
+![WAZUH SCREENSHOT](img/T1016.png)
