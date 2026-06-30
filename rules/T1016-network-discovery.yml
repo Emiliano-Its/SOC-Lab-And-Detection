@@ -1,0 +1,38 @@
+title: Network Configuration Discovery via Built-in Tools Spawned by PowerShell
+id: fdfb3f2a-c75f-4931-a9f9-1bd1f8df266d
+status: experimental
+description: >
+    Detects execution of built-in Windows network discovery tools launched
+    directly by PowerShell. Adversaries use these tools during the reconnaissance
+    phase to map the network, identify live hosts, find the domain controller,
+    and locate high-value targets for lateral movement. While these tools are
+    legitimate, being spawned directly by PowerShell is unusual in normal
+    administrative workflows — admins typically run them from cmd.exe or a
+    terminal, not from within a PowerShell process.
+references:
+    - https://attack.mitre.org/techniques/T1016/
+author: Jose Emiliano Cortez Rivera
+date: 2026/06/29
+tags:
+    - attack.discovery
+    - attack.t1016
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        ParentImage|endswith: '\powershell.exe'
+        Image|endswith:
+            - '\ipconfig.exe'
+            - '\arp.exe'
+            - '\route.exe'
+            - '\nslookup.exe'
+            - '\net.exe'
+            - '\netstat.exe'
+            - '\whoami.exe'
+    condition: selection
+falsepositives:
+    - PowerShell admin or monitoring scripts that invoke network tools directly
+    - IT automation tools (Ansible, SCCM) running network checks via PowerShell
+    - Legitimate network inventory scripts used by sysadmins
+level: medium
