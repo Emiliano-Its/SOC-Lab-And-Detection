@@ -1,0 +1,33 @@
+title: PowerShell Spawning Child PowerShell Instance
+id: 148bb739-ad52-4e7e-af98-db7c4595c894
+status: experimental
+description: >
+    Detects PowerShell spawning a child PowerShell instance, a behavior commonly
+    observed during post-exploitation when attackers use a first-stage PS session
+    to download and execute a second-stage payload. Legitimate admin scripts and
+    IT automation tools can also trigger this rule.
+references:
+    - https://attack.mitre.org/techniques/T1059/001/
+author: Jose Emiliano Cortez Rivera
+date: 2026/06/29
+tags:
+    - attack.execution
+    - attack.t1059.001
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        ParentImage|endswith: '\powershell.exe'
+        Image|endswith: '\powershell.exe'
+    filter:
+        ParentImage|startswith:
+            - 'C:\Program Files\'
+            - 'C:\Program Files (x86)\'
+            - 'C:\Windows\System32\'
+    condition: selection and not filter
+falsepositives:
+    - Administrative PowerShell scripts that invoke child PowerShell instances
+    - Software installers using PowerShell sub-processes
+    - IT automation tools (Ansible, Puppet, Chef) in enterprise environments
+level: medium
