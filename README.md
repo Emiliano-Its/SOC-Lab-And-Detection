@@ -1,100 +1,54 @@
 # Home SOC Lab & Detection Engineering
 
-
-## Project Overview
-
-This project simulates building a minimum viable SOC from scratch for a small fintech startup with no existing monitoring infrastructure. The lab covers the full detection engineering lifecycle: deploy, ingest, simulate, detect, and respond.
+A hands-on detection engineering lab built from scratch on Microsoft Azure. The goal is to simulate realistic attacker behavior across a multi-host environment, build custom detections in Sigma, and produce incident response documentation — covering the full blue team lifecycle from telemetry ingestion to alert triage.
 
 ---
 
-## Lab Architecture
+## Architecture
 
-| VM | Role | Size | OS |
-|---|---|---|---|
-| `soc-lab-windows` | Victim endpoint | Standard D2s v3 | Windows 11 Pro |
-| `soc-lab-UbuntuServer` | Linux server + Zeek | Standard D2s v3 | Ubuntu Server 24.04 LTS |
-| `soc-lab-wazuh` | SIEM | Standard D4s v3 | Ubuntu Server 24.04 LTS |
+Three isolated VMs deployed on Azure inside a private virtual network (`soc-lab-vnet`, `10.0.0.0/16`):
 
-All VMs are deployed on **Microsoft Azure** (East US region) inside an isolated Virtual Network (`soc-lab-vnet`, `10.0.0.0/16`).
-
----
-
-## Technology Stack
-
-### Infrastructure
-- **Cloud:** Microsoft Azure (Azure for Students)
-- **Virtualization:** Azure Virtual Machines
-- **Network:** Azure Virtual Network (`soc-lab-vnet`, isolated)
-
-### Telemetry
-- **Sysmon** (SwiftOnSecurity config) — deep Windows endpoint visibility
-- **auditd** (Neo23x0 ruleset) — Linux command and file activity
-- **Zeek 8.2.0** — network traffic analysis (JSON output)
-
-### SIEM
-- **Wazuh 4.14.5** — log ingestion, alerting, MITRE ATT&CK mapping
-- **Wazuh Agent** — installed on Windows and Ubuntu VMs
-
-### Attack Simulation
-- **Atomic Red Team** (Invoke-AtomicTest) — controlled attack technique execution
-
-### Detection
-- **Sigma** (YAML) — universal detection rule format
-- **pySigma** — converts Sigma rules to Wazuh native format
-
-### Version Control
-- **GitHub** — stores all rules, reports, diagrams, and documentation
-
----
-
-## How Logs Flow
+| Host | Role | OS |
+|---|---|---|
+| `soc-lab-windows` | Victim endpoint | Windows 11 Pro |
+| `soc-lab-UbuntuServer` | Linux server + network sensor | Ubuntu Server 24.04 LTS |
+| `soc-lab-wazuh` | SIEM | Ubuntu Server 24.04 LTS |
 
 ```
-Windows VM (Sysmon + Wazuh Agent)
+Windows (Sysmon + Wazuh Agent)
         │
-        ├──────────────────────────┐
-        │                         ▼
-Ubuntu VM (auditd + Zeek          Wazuh SIEM
-         + Wazuh Agent) ─────────► (alerts + dashboards)
+        ├─────────────────────────────┐
+        │                             ▼
+Ubuntu (auditd + Zeek + Wazuh Agent)──► Wazuh SIEM
 ```
 
 ---
 
-## Project Phases
+## Stack
 
-### Phase 1 — Lab Build & Telemetry ✅ COMPLETE
-- [x] Azure resource group created (`soc-lab`)
-- [x] Isolated virtual network deployed (`soc-lab-vnet`)
-- [x] Windows 11 VM deployed (`soc-lab-windows`)
-- [x] Ubuntu Server VM deployed (`soc-lab-UbuntuServer`)
-- [x] Wazuh SIEM VM deployed (`soc-lab-wazuh`)
-- [x] Wazuh 4.14.5 installed and dashboard accessible
-- [x] Wazuh agent installed on Windows (`windows-endpoint`)
-- [x] Wazuh agent installed on Ubuntu (`ubuntu-server`)
-- [x] Sysmon installed on Windows (SwiftOnSecurity config)
-- [x] Sysmon events flowing into Wazuh (verified via Threat Hunting)
-- [x] auditd configured on Ubuntu (Neo23x0 ruleset)
-- [x] auditd events flowing into Wazuh
-- [x] Zeek 8.2.0 installed and capturing network traffic (JSON format)
-- [x] Zeek logs flowing into Wazuh archives
-- [x] All logs searchable in Wazuh
+| Layer | Tool |
+|---|---|
+| SIEM | Wazuh 4.14.5 |
+| Endpoint telemetry (Windows) | Sysmon — SwiftOnSecurity config |
+| Endpoint telemetry (Linux) | auditd — Neo23x0 ruleset |
+| Network telemetry | Zeek 8.2.0 (JSON output) |
+| Attack simulation | Atomic Red Team (Invoke-AtomicTest) |
+| Detection format | Sigma (YAML) |
+| Rule conversion | pySigma |
 
-### Phase 2 — Attack Simulation *(current)*
-- [ ] ≥ 6 ATT&CK techniques selected (≥ 3 tactics)
-- [ ] Atomic Red Team installed on Windows VM
-- [ ] Each technique executed and logged
-- [ ] Evidence captured per technique
+---
 
-### Phase 3 — Detection Engineering
-- [ ] ≥ 6 Sigma rules written (one per technique)
-- [ ] Each rule tested and alert screenshot captured
-- [ ] At least 1 rule tuned (before/after documented)
-- [ ] At least 1 correlation rule across 2 data sources
-- [ ] pySigma conversion to Wazuh format
+## ATT&CK Coverage
 
-### Phase 4 — Incident Response Writeups
-- [ ] 3 IR reports written
-- [ ] 1 report written for non-technical leadership
+| Technique | Name | Tactic | Sigma Rule |
+|---|---|---|---|
+| T1003 | OS Credential Dumping | Credential Access | ✓ |
+| T1016 | System Network Configuration Discovery | Discovery | ✓ |
+| T1041 | Exfiltration Over C2 Channel | Exfiltration | ✓ |
+| T1046 | Network Service Discovery | Discovery | ✓ |
+| T1057 | Process Discovery | Discovery | ✓ |
+| T1059.001 | PowerShell | Execution | ✓ |
+| T1059.001 | PowerShell Encoded Commands | Execution | ✓ |
 
 ---
 
@@ -107,51 +61,36 @@ Ubuntu VM (auditd + Zeek          Wazuh SIEM
 ├── /architecture/
 │   └── lab-topology.png
 ├── /rules/
-│   └── *.yml (Sigma rules)
+│   └── *.yml              — one Sigma rule per technique
 ├── /attacks/
-│   └── *.md (one per ATT&CK technique)
+│   └── *.md               — one doc per simulated technique
 ├── /ir-reports/
-│   └── *.md (3 incident response reports)
+│   └── *.md               — incident response writeups
 └── /tuning/
-    └── *.md (before/after rule tuning)
+    └── *.md               — before/after rule tuning documentation
 ```
 
 ---
 
-## How to Reproduce the Lab
+## Detection Engineering Approach
 
-### Prerequisites
-- Microsoft Azure account (student or PAYG)
-- Basic Linux CLI knowledge
-- Git installed
-- SSH key pair generated
+Each technique follows the same workflow:
 
-### Quick Start
-```bash
-# Clone this repo
-git clone https://github.com/Emiliano-Its/SOC-Lab-And-Detection.git
-cd SOC-Lab-And-Detection
-```
-
-### Key Lessons Learned
-- Wazuh agent requires read permissions on log files
-  - Add `wazuh` user to `adm` group for audit.log: `sudo usermod -aG adm wazuh`
-  - Add `wazuh` user to `zeek` group for Zeek logs: `sudo usermod -aG zeek wazuh`
-- Zeek must output JSON format: add `@load policy/tuning/json-logs` to local.zeek
-- Zeek actual log path is `/opt/zeek/spool/zeek/` not `/opt/zeek/logs/current/`
-- Enable `logall_json` in Wazuh to archive all logs including non-alert events
-- Azure NSG must have port 443 open for Wazuh dashboard external access
-- Always stop VMs from Azure Portal to get "Stopped (deallocated)" state
+1. **Simulate** — execute the technique using Atomic Red Team
+2. **Observe** — identify what telemetry Wazuh captured and from which source
+3. **Write** — author a Sigma rule targeting the specific behavior, not the generic alert
+4. **Tune** — introduce a benign edge case, refine the rule logic until false positives disappear
+5. **Document** — produce an IR writeup treating the detection as a real incident
 
 ---
 
-## MITRE ATT&CK Coverage
+## Key Technical Notes
 
-> To be updated as attack simulations are completed.
-
-| Technique ID | Name | Tactic | Detected |
-|---|---|---|---|
-| TBD | TBD | TBD | ⏳ |
+- Wazuh agent requires read access to log files — add `wazuh` user to `adm` group for `audit.log` and `zeek` group for Zeek logs
+- Zeek must output JSON format: load `policy/tuning/json-logs` in `local.zeek`
+- Zeek log path is `/opt/zeek/spool/zeek/` — not `/opt/zeek/logs/current/`
+- Enable `logall_json` in Wazuh to archive all events, not just alerts
+- Azure NSG requires port 443 open for external Wazuh dashboard access
 
 ---
 
@@ -165,11 +104,3 @@ cd SOC-Lab-And-Detection
 - [Zeek Documentation](https://docs.zeek.org)
 - [Wazuh Documentation](https://documentation.wazuh.com)
 - [The DFIR Report](https://thedfirreport.com)
-
----
-
-## Author
-
-Jose Emiliano Cortez Rivera
-Cybersecurity Student — Universidad Autónoma de Nuevo León
-GitHub: [Emiliano-Its](https://github.com/Emiliano-Its)
