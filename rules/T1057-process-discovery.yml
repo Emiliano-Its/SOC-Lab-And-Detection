@@ -1,0 +1,30 @@
+title: Process Discovery via Tasklist Spawned by PowerShell
+id: d0b03933-20e7-4aee-a151-2146d2a04c60
+status: experimental
+description: >
+    Detects the execution of tasklist.exe launched directly by PowerShell,
+    a behavior commonly seen during the reconnaissance phase of an attack.
+    Adversaries run tasklist to enumerate running processes and identify
+    security tools, high-value targets (browsers, email clients), or
+    credential stores (lsass.exe) before moving to the next stage.
+    Legitimate admin use of tasklist is typically launched from cmd.exe
+    or a terminal, not directly from PowerShell.
+references:
+    - https://attack.mitre.org/techniques/T1057/
+author: Jose Emiliano Cortez Rivera
+date: 2026/06/29
+tags:
+    - attack.discovery
+    - attack.t1057
+logsource:
+    category: process_creation
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\tasklist.exe'
+        ParentImage|endswith: '\powershell.exe'
+    condition: selection
+falsepositives:
+    - PowerShell admin scripts that call tasklist.exe directly for inventory or monitoring purposes
+    - IT automation tools invoking tasklist via PowerShell (e.g., SCCM, Ansible on Windows)
+level: medium
