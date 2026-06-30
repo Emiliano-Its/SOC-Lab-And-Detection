@@ -1,0 +1,40 @@
+title: PowerShell Outbound Connection to Raw IP on Non-Standard Port
+id: 6f2982f7-ed45-48f6-a04f-7bb7455e96cd
+status: experimental
+description: >
+    Detects PowerShell initiating an outbound network connection to a raw IP
+    address (no hostname) on a non-standard port commonly associated with C2
+    frameworks. Adversaries use PowerShell to exfiltrate data over an existing
+    C2 channel, blending traffic with legitimate activity. Legitimate PowerShell
+    network activity (Windows Update, REST APIs, cloud management) typically
+    connects to named domains on port 443, not to raw IPs on unusual ports.
+    Combining both indicators significantly reduces false positives.
+references:
+    - https://attack.mitre.org/techniques/T1041/
+author: Jose Emiliano Cortez Rivera
+date: 2026/06/29
+tags:
+    - attack.exfiltration
+    - attack.t1041
+logsource:
+    category: network_connection
+    product: windows
+detection:
+    selection:
+        Image|endswith: '\powershell.exe'
+        Initiated: 'true'
+        DestinationHostname: ''
+        DestinationPort:
+            - 4444
+            - 1337
+            - 8443
+            - 8080
+            - 9001
+            - 4445
+            - 4446
+    condition: selection
+falsepositives:
+    - Rare cases where legitimate PowerShell scripts connect directly to IP addresses on non-standard ports
+    - Internal network monitoring tools using PowerShell with non-standard ports
+    - Authorized red team or penetration testing activity
+level: high
