@@ -1,0 +1,36 @@
+title: Network Port Scan Detected via Multiple Rejected Connections
+id: a39e3c9f-96bb-45c7-88d6-bb88825d1aa8
+status: experimental
+description: >
+    Detects network port scanning activity identified by a single source IP
+    generating multiple rejected or refused connections to different destination
+    ports in a short time window. Adversaries perform port scans during the
+    reconnaissance phase to identify live hosts, open services, and potential
+    entry points for lateral movement. Unlike endpoint-based detections, this
+    rule relies on network telemetry from Zeek, capturing the traffic pattern
+    directly regardless of what tool or process initiated the scan.
+references:
+    - https://attack.mitre.org/techniques/T1046/
+author: Jose Emiliano Cortez Rivera
+date: 2026/06/29
+tags:
+    - attack.discovery
+    - attack.t1046
+logsource:
+    category: firewall
+    product: zeek
+detection:
+    selection:
+        event_type: 'conn'
+        conn_state:
+            - 'REJ'     # connection rejected
+            - 'RSTO'    # reset by originator
+            - 'RSTOS0'  # reset without handshake
+    timeframe: 20s
+    condition: selection | count(id.resp_p) by id.orig_h > 5
+falsepositives:
+    - Legitimate vulnerability scanners run by the security team (Nessus, OpenVAS)
+    - Network monitoring tools performing service discovery
+    - Misconfigured applications repeatedly attempting failed connections
+    - Authorized penetration testing activity
+level: medium
