@@ -1,0 +1,19 @@
+# Python venv (created in project root)
+pyvenv.cfg
+bin/
+include/
+lib/
+lib64
+
+# PDF brief — kept locally, not tracked in repo
+*.pdf
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+
+# OS
+.DS_Store
+Thumbs.db

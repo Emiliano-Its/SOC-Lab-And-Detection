@@ -1,0 +1,106 @@
+<!-- Local rules -->
+<!-- Copyright (C) 2015, Wazuh Inc. -->
+
+<group name="local,syslog,sshd,">
+
+  <!--
+  Dec 10 01:02:02 host sshd[1234]: Failed none for root from 1.1.1.1 port 1066 ssh2
+  -->
+  <rule id="100001" level="5">
+    <if_sid>5716</if_sid>
+    <srcip>1.1.1.1</srcip>
+    <description>sshd: authentication failed from IP 1.1.1.1.</description>
+    <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,</group>
+  </rule>
+
+</group>
+
+<group name="soc_lab,sysmon,windows,">
+
+  <!--
+    T1059.001 - PowerShell Spawning Child PowerShell Instance
+    Sigma source: rules/T1059.001-powershell-spawn.yml
+    Fires when powershell.exe is spawned by another powershell.exe that is NOT
+    running from a trusted system path (Program Files, System32).
+  -->
+  <rule id="100101" level="12">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\powershell\.exe$</field>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)^(?!C:\\Program Files\\)(?!C:\\Program Files \(x86\)\\)(?!C:\\Windows\\System32\\).*\\powershell\.exe$</field>
+    <description>T1059.001: PowerShell spawned a child PowerShell from an untrusted parent path</description>
+    <mitre>
+      <id>T1059.001</id>
+    </mitre>
+    <group>attack,execution,</group>
+  </rule>
+
+  <!--
+    T1003 - Credential Dumping Tool Execution
+    Sigma source: rules/T1003-credential-dumping.yml
+    Fires on execution of any known credential dumping tool by image name.
+  -->
+  <rule id="100102" level="14">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(gsecdump|mimikatz|procdump|wce|pwdump|pypykatz|lsadump)\.exe$</field>
+    <description>T1003: Known credential dumping tool executed</description>
+    <mitre>
+      <id>T1003</id>
+      <id>T1003.001</id>
+    </mitre>
+    <group>attack,credential_access,</group>
+  </rule>
+
+  <!--
+    T1016 - Network Configuration Discovery via Built-in Tools Spawned by PowerShell
+    Sigma source: rules/T1016-network-discovery.yml
+    Fires when common network recon tools are spawned directly by powershell.exe.
+  -->
+  <rule id="100103" level="10">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)\\powershell\.exe$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\(ipconfig|arp|route|nslookup|net|netstat|whoami)\.exe$</field>
+    <description>T1016: Built-in network discovery tool spawned by PowerShell</description>
+    <mitre>
+      <id>T1016</id>
+    </mitre>
+    <group>attack,discovery,</group>
+  </rule>
+
+  <!--
+    T1057 - Process Discovery via Tasklist Spawned by PowerShell
+    Sigma source: rules/T1057-process-discovery.yml
+    Fires when tasklist.exe is launched directly by powershell.exe.
+  -->
+  <rule id="100104" level="10">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\tasklist\.exe$</field>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)\\powershell\.exe$</field>
+    <description>T1057: tasklist.exe spawned by PowerShell (process enumeration)</description>
+    <mitre>
+      <id>T1057</id>
+    </mitre>
+    <group>attack,discovery,</group>
+  </rule>
+
+  <!--
+    T1041 - PowerShell Outbound Connection to Known C2 Port
+    Sigma source: rules/T1041-exfiltration-c2.yml
+    Fires on Sysmon Event ID 3 (network connection) when powershell.exe initiates
+    an outbound connection to a port commonly used by C2 frameworks.
+    NOTE: the Sigma rule also checks DestinationHostname='' (raw IP, no DNS name).
+    Wazuh cannot assert field absence in a single rule — the C2 port list provides
+    strong enough signal on its own for this lab context.
+  -->
+  <rule id="100105" level="14">
+    <if_group>sysmon_event3</if_group>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\powershell\.exe$</field>
+    <field name="win.eventdata.initiated" type="pcre2">(?i)^true$</field>
+    <field name="win.eventdata.destinationPort" type="pcre2">^(4444|1337|8443|8080|9001|4445|4446)$</field>
+    <description>T1041: PowerShell outbound connection to a known C2 port</description>
+    <mitre>
+      <id>T1041</id>
+    </mitre>
+    <group>attack,exfiltration,</group>
+  </rule>
+
+</group>
