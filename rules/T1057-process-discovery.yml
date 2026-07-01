@@ -22,9 +22,12 @@ logsource:
 detection:
     selection:
         Image|endswith: '\tasklist.exe'
-        ParentImage|endswith: '\powershell.exe'
+        ParentImage|endswith:
+            - '\powershell.exe'
+            - '\cmd.exe'
     condition: selection
 falsepositives:
-    - PowerShell admin scripts that call tasklist.exe directly for inventory or monitoring purposes
-    - IT automation tools invoking tasklist via PowerShell (e.g., SCCM, Ansible on Windows)
+    - PowerShell or cmd admin scripts that call tasklist.exe directly for inventory or monitoring purposes
+    - IT automation tools invoking tasklist via PowerShell or cmd (e.g., SCCM, Ansible on Windows)
+    - Helpdesk staff running tasklist from cmd.exe for troubleshooting
 level: medium

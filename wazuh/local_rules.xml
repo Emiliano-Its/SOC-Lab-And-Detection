@@ -74,8 +74,8 @@
   <rule id="100104" level="10">
     <if_group>sysmon_event1</if_group>
     <field name="win.eventdata.image" type="pcre2">(?i)\\tasklist\.exe$</field>
-    <field name="win.eventdata.parentImage" type="pcre2">(?i)\\powershell\.exe$</field>
-    <description>T1057: tasklist.exe spawned by PowerShell (process enumeration)</description>
+    <field name="win.eventdata.parentImage" type="pcre2">(?i)\\(powershell|cmd)\.exe$</field>
+    <description>T1057: tasklist.exe spawned by PowerShell or cmd (process enumeration)</description>
     <mitre>
       <id>T1057</id>
     </mitre>
