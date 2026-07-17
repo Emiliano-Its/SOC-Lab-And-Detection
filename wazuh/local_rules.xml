@@ -103,4 +103,36 @@
     <group>attack,exfiltration,</group>
   </rule>
 
+
+<!--
+  T1059.001/T1003 - PowerShell Mimikatz Download and Execution
+  Detects cmd.exe or powershell.exe running IEX + Invoke-Mimikatz
+-->
+<rule id="100106" level="15">
+  <if_group>sysmon_event1</if_group>
+  <field name="win.eventdata.commandLine" type="pcre2">(?i)(Invoke-Mimikatz|DumpCreds)</field>
+  <description>T1059.001/T1003: Mimikatz execution detected in command line</description>
+  <mitre>
+    <id>T1059.001</id>
+    <id>T1003</id>
+  </mitre>
+  <group>attack,execution,credential_access,</group>
+</rule>
+
+<!--
+  T1059.001 - IEX DownloadString execution
+  Detects PowerShell downloading and executing remote scripts
+-->
+<rule id="100107" level="14">
+  <if_group>sysmon_event1</if_group>
+  <field name="win.eventdata.commandLine" type="pcre2">(?i)(IEX|Invoke-Expression).*DownloadString</field>
+  <description>T1059.001/T1105: PowerShell IEX DownloadString - remote script execution</description>
+  <mitre>
+    <id>T1059.001</id>
+    <id>T1105</id>
+  </mitre>
+  <group>attack,execution,</group>
+</rule>
+
+
 </group>
