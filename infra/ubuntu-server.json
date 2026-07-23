@@ -1,0 +1,104 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_soc_lab_UbuntuServer_name": {
+            "defaultValue": "soc-lab-UbuntuServer",
+            "type": "String"
+        },
+        "adminUsername": {
+            "defaultValue": "REPLACE_ME",
+            "type": "String"
+        },
+        "sshPublicKey": {
+            "defaultValue": "REPLACE_ME_WITH_YOUR_SSH_PUBLIC_KEY",
+            "type": "String"
+        },
+        "disks_soc_lab_UbuntuServer_OsDisk_1_476bd97952a94be79378f70bea25859d_externalid": {
+            "defaultValue": "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.Compute/disks/soc-lab-UbuntuServer_OsDisk_1_476bd97952a94be79378f70bea25859d",
+            "type": "String"
+        },
+        "networkInterfaces_soc_lab_ubuntuserver451_externalid": {
+            "defaultValue": "/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.Network/networkInterfaces/soc-lab-ubuntuserver451",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2025-11-01",
+            "name": "[parameters('virtualMachines_soc_lab_UbuntuServer_name')]",
+            "location": "eastus",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D2s_v3"
+                },
+                "additionalCapabilities": {
+                    "hibernationEnabled": false
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "canonical",
+                        "offer": "ubuntu-24_04-lts",
+                        "sku": "server",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Linux",
+                        "name": "[concat(parameters('virtualMachines_soc_lab_UbuntuServer_name'), '_OsDisk_1_476bd97952a94be79378f70bea25859d')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "id": "[parameters('disks_soc_lab_UbuntuServer_OsDisk_1_476bd97952a94be79378f70bea25859d_externalid')]"
+                        },
+                        "deleteOption": "Delete"
+                    },
+                    "dataDisks": [],
+                    "diskControllerType": "SCSI"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_soc_lab_UbuntuServer_name')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('sshPublicKey')]"
+                                }
+                            ]
+                        },
+                        "provisionVMAgent": true,
+                        "patchSettings": {
+                            "patchMode": "ImageDefault",
+                            "assessmentMode": "ImageDefault"
+                        }
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true,
+                    "adminUsername": "[parameters('adminUsername')]"
+                },
+                "securityProfile": {
+                    "securityType": "Standard"
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_soc_lab_ubuntuserver451_externalid')]",
+                            "properties": {
+                                "deleteOption": "Delete"
+                            }
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true
+                    }
+                }
+            }
+        }
+    ]
+}

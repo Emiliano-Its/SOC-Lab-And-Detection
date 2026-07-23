@@ -60,6 +60,8 @@ Ubuntu (auditd + Zeek + Wazuh Agent)──► Wazuh SIEM
 ├── LESSONS_LEARNED.md
 ├── /architecture/
 │   └── lab-topology.png
+├── /infra/
+│   └── *.json             — sanitized ARM templates for the 3 lab VMs
 ├── /rules/
 │   └── *.yml              — one Sigma rule per technique
 ├── /attacks/
